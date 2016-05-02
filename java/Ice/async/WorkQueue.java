@@ -6,33 +6,23 @@
 
 import Demo.*;
 
-public class WorkQueue extends Thread
-{
-    class CallbackEntry
-    {
+public class WorkQueue extends Thread {
+    class CallbackEntry {
         AMD_Hello_sayHello cb;
         int delay;
     }
 
     @Override
-    public synchronized void
-    run()
-    {
-        while(!_done)
-        {
-            if(_callbacks.size() == 0)
-            {
-                try
-                {
+    public synchronized void run() {
+        while (!_done) {
+            if (_callbacks.size() == 0) {
+                try {
                     wait();
-                }
-                catch(java.lang.InterruptedException ex)
-                {
+                } catch (java.lang.InterruptedException ex) {
                 }
             }
 
-            if(_callbacks.size() != 0)
-            {
+            if (_callbacks.size() != 0) {
                 //
                 // Get next work item.
                 //
@@ -43,16 +33,12 @@ public class WorkQueue extends Thread
                 // emulate a process that takes a significant period of
                 // time to complete.
                 //
-                try
-                {
+                try {
                     wait(entry.delay);
-                }
-                catch(java.lang.InterruptedException ex)
-                {
+                } catch (java.lang.InterruptedException ex) {
                 }
 
-                if(!_done)
-                {
+                if (!_done) {
                     //
                     // Print greeting and send response.
                     //
@@ -66,17 +52,14 @@ public class WorkQueue extends Thread
         //
         // Throw exception for any outstanding requests.
         //
-        for(CallbackEntry p : _callbacks)
-        {
+        for (CallbackEntry p : _callbacks) {
             p.cb.ice_exception(new RequestCanceledException());
         }
     }
 
     public synchronized void
-    add(AMD_Hello_sayHello cb, int delay)
-    {
-        if(!_done)
-        {
+    add(AMD_Hello_sayHello cb, int delay) {
+        if (!_done) {
             //
             // Add the work item.
             //
@@ -84,14 +67,11 @@ public class WorkQueue extends Thread
             entry.cb = cb;
             entry.delay = delay;
 
-            if(_callbacks.size() == 0)
-            {
+            if (_callbacks.size() == 0) {
                 notify();
             }
             _callbacks.add(entry);
-        }
-        else
-        {
+        } else {
             //
             // Destroyed, throw exception.
             //

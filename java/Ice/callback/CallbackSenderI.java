@@ -4,36 +4,28 @@
 //
 // **********************************************************************
 
-import Demo.*;
+import Demo.CallbackReceiverPrx;
+import Demo._CallbackSenderDisp;
 
-public final class CallbackSenderI extends _CallbackSenderDisp
-{
+public final class CallbackSenderI extends _CallbackSenderDisp {
     @Override
     public void
-    initiateCallback(CallbackReceiverPrx proxy, Ice.Current current)
-    {
+    initiateCallback(CallbackReceiverPrx proxy, Ice.Current current) {
         System.out.println("initiating callback");
-        try
-        {
+        try {
             proxy.callback();
-        }
-        catch(Ice.LocalException ex)
-        {
+        } catch (Ice.LocalException ex) {
             ex.printStackTrace();
         }
     }
 
     @Override
     public void
-    shutdown(Ice.Current current)
-    {
+    shutdown(Ice.Current current) {
         System.out.println("Shutting down...");
-        try
-        {
+        try {
             current.adapter.getCommunicator().shutdown();
-        }
-        catch(Ice.LocalException ex)
-        {
+        } catch (Ice.LocalException ex) {
             ex.printStackTrace();
         }
     }

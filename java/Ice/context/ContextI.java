@@ -4,22 +4,17 @@
 //
 // **********************************************************************
 
-import Demo.*;
+import Demo._ContextDisp;
 
-public class ContextI extends _ContextDisp
-{
+public class ContextI extends _ContextDisp {
     @Override
     public void
-    call(Ice.Current current)
-    {
+    call(Ice.Current current) {
         System.out.print("Type = ");
         String type = current.ctx.get("type");
-        if(type != null)
-        {
+        if (type != null) {
             System.out.print(type);
-        }
-        else
-        {
+        } else {
             System.out.print("None");
         }
         System.out.println();
@@ -27,8 +22,7 @@ public class ContextI extends _ContextDisp
 
     @Override
     public void
-    shutdown(Ice.Current current)
-    {
+    shutdown(Ice.Current current) {
         System.out.println("Shutting down...");
         current.adapter.getCommunicator().shutdown();
     }

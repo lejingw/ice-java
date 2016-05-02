@@ -4,44 +4,38 @@
 //
 // **********************************************************************
 
-import Demo.*;
+import Demo.CallbackReceiverPrx;
+import Demo.CallbackReceiverPrxHelper;
+import Demo.CallbackSenderPrx;
+import Demo.CallbackSenderPrxHelper;
 
-public class Client extends Ice.Application
-{
-    class ShutdownHook extends Thread
-    {
+public class Client extends Ice.Application {
+    class ShutdownHook extends Thread {
         @Override
         public void
-        run()
-        {
-            try
-            {
+        run() {
+            try {
                 communicator().destroy();
-            }
-            catch(Ice.LocalException ex)
-            {
+            } catch (Ice.LocalException ex) {
                 ex.printStackTrace();
             }
         }
     }
 
     private static void
-    menu()
-    {
+    menu() {
         System.out.println(
-            "usage:\n" +
-            "t: send callback\n" +
-            "s: shutdown server\n" +
-            "x: exit\n" +
-            "?: help\n");
+                "usage:\n" +
+                        "t: send callback\n" +
+                        "s: shutdown server\n" +
+                        "x: exit\n" +
+                        "?: help\n");
     }
 
     @Override
     public int
-    run(String[] args)
-    {
-        if(args.length > 0)
-        {
+    run(String[] args) {
+        if (args.length > 0) {
             System.err.println(appName() + ": too many arguments");
             return 1;
         }
@@ -54,10 +48,9 @@ public class Client extends Ice.Application
         setInterruptHook(new ShutdownHook());
 
         CallbackSenderPrx sender = CallbackSenderPrxHelper.checkedCast(
-            communicator().propertyToProxy("CallbackSender.Proxy").
-                ice_twoway().ice_timeout(-1).ice_secure(false));
-        if(sender == null)
-        {
+                communicator().propertyToProxy("CallbackSender.Proxy").
+                        ice_twoway().ice_timeout(-1).ice_secure(false));
+        if (sender == null) {
             System.err.println("invalid proxy");
             return 1;
         }
@@ -66,65 +59,48 @@ public class Client extends Ice.Application
         adapter.add(new CallbackReceiverI(), communicator().stringToIdentity("callbackReceiver"));
         adapter.activate();
 
-        CallbackReceiverPrx receiver = 
-            CallbackReceiverPrxHelper.uncheckedCast(adapter.createProxy(
-                communicator().stringToIdentity("callbackReceiver")));
+        CallbackReceiverPrx receiver =
+                CallbackReceiverPrxHelper.uncheckedCast(adapter.createProxy(
+                        communicator().stringToIdentity("callbackReceiver")));
 
         menu();
 
         java.io.BufferedReader in = new java.io.BufferedReader(new java.io.InputStreamReader(System.in));
 
         String line = null;
-        do
-        {
-            try
-            {
+        do {
+            try {
                 System.out.print("==> ");
                 System.out.flush();
                 line = in.readLine();
-                if(line == null)
-                {
+                if (line == null) {
                     break;
                 }
-                if(line.equals("t"))
-                {
+                if (line.equals("t")) {
                     sender.initiateCallback(receiver);
-                }
-                else if(line.equals("s"))
-                {
+                } else if (line.equals("s")) {
                     sender.shutdown();
-                }
-                else if(line.equals("x"))
-                {
+                } else if (line.equals("x")) {
                     // Nothing to do
-                }
-                else if(line.equals("?"))
-                {
+                } else if (line.equals("?")) {
                     menu();
-                }
-                else
-                {
+                } else {
                     System.out.println("unknown command `" + line + "'");
                     menu();
                 }
-            }
-            catch(java.io.IOException ex)
-            {
+            } catch (java.io.IOException ex) {
                 ex.printStackTrace();
-            }
-            catch(Ice.LocalException ex)
-            {
+            } catch (Ice.LocalException ex) {
                 ex.printStackTrace();
             }
         }
-        while(!line.equals("x"));
+        while (!line.equals("x"));
 
         return 0;
     }
 
     public static void
-    main(String[] args)
-    {
+    main(String[] args) {
         Client app = new Client();
         int status = app.main("Client", args, "config.client");
         System.exit(status);

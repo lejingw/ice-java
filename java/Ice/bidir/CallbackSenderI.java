@@ -4,18 +4,16 @@
 //
 // **********************************************************************
 
-import Demo.*;
+import Demo.CallbackReceiverPrx;
+import Demo.CallbackReceiverPrxHelper;
+import Demo._CallbackSenderDisp;
 
-class CallbackSenderI extends _CallbackSenderDisp implements java.lang.Runnable
-{
-    CallbackSenderI(Ice.Communicator communicator)
-    {
+class CallbackSenderI extends _CallbackSenderDisp implements java.lang.Runnable {
+    CallbackSenderI(Ice.Communicator communicator) {
         _communicator = communicator;
     }
 
-    synchronized public void
-    destroy()
-    {
+    synchronized public void destroy() {
         System.out.println("destroying callback sender");
         _destroy = true;
 
@@ -24,8 +22,7 @@ class CallbackSenderI extends _CallbackSenderDisp implements java.lang.Runnable
 
     @Override
     synchronized public void
-    addClient(Ice.Identity ident, Ice.Current current)
-    {
+    addClient(Ice.Identity ident, Ice.Current current) {
         System.out.println("adding client `" + _communicator.identityToString(ident) + "'");
 
         Ice.ObjectPrx base = current.con.createProxy(ident);
@@ -34,49 +31,35 @@ class CallbackSenderI extends _CallbackSenderDisp implements java.lang.Runnable
     }
 
     @Override
-    public void
-    run()
-    {
+    public void run() {
         int num = 0;
-        while(true)
-        {
+        while (true) {
             java.util.List<CallbackReceiverPrx> clients;
-            synchronized(this)
-            {
-                try
-                {
+            synchronized (this) {
+                try {
                     this.wait(2000);
-                }
-                catch(java.lang.InterruptedException ex)
-                {
+                } catch (java.lang.InterruptedException ex) {
                 }
 
-                if(_destroy)
-                {
+                if (_destroy) {
                     break;
                 }
 
                 clients = new java.util.ArrayList<CallbackReceiverPrx>(_clients);
             }
 
-            if(!clients.isEmpty())
-            {
+            if (!clients.isEmpty()) {
                 ++num;
 
-                for(CallbackReceiverPrx p : clients)
-                {
-                    try
-                    {
+                for (CallbackReceiverPrx p : clients) {
+                    try {
                         p.callback(num);
-                    }
-                    catch(Exception ex)
-                    {
+                    } catch (Exception ex) {
                         System.out.println("removing client `" + _communicator.identityToString(p.ice_getIdentity()) +
-                                           "':");
+                                "':");
                         ex.printStackTrace();
 
-                        synchronized(this)
-                        {
+                        synchronized (this) {
                             _clients.remove(p);
                         }
                     }

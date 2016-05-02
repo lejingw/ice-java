@@ -4,47 +4,39 @@
 //
 // **********************************************************************
 
-import Demo.*;
+import Demo.ContextPrx;
+import Demo.ContextPrxHelper;
 
-public class Client extends Ice.Application
-{
-    class ShutdownHook extends Thread
-    {
+public class Client extends Ice.Application {
+    class ShutdownHook extends Thread {
         @Override
         public void
-        run()
-        {
-            try
-            {
+        run() {
+            try {
                 communicator().destroy();
-            }
-            catch(Ice.LocalException ex)
-            {
+            } catch (Ice.LocalException ex) {
                 ex.printStackTrace();
             }
         }
     }
 
     private static void
-    menu()
-    {
+    menu() {
         System.out.println(
-            "usage:\n" +
-            "1: call with no request context\n" +
-            "2: call with explicit request context\n" +
-            "3: call with per-proxy request context\n" +
-            "4: call with implicit request context\n" +
-            "s: shutdown server\n" +
-            "x: exit\n" +
-            "?: help\n");
+                "usage:\n" +
+                        "1: call with no request context\n" +
+                        "2: call with explicit request context\n" +
+                        "3: call with per-proxy request context\n" +
+                        "4: call with implicit request context\n" +
+                        "s: shutdown server\n" +
+                        "x: exit\n" +
+                        "?: help\n");
     }
 
     @Override
     public int
-    run(String[] args)
-    {
-        if(args.length > 0)
-        {
+    run(String[] args) {
+        if (args.length > 0) {
             System.err.println(appName() + ": too many arguments");
             return 1;
         }
@@ -57,8 +49,7 @@ public class Client extends Ice.Application
         setInterruptHook(new ShutdownHook());
 
         ContextPrx proxy = ContextPrxHelper.checkedCast(communicator().propertyToProxy("Context.Proxy"));
-        if(proxy == null)
-        {
+        if (proxy == null) {
             System.err.println("invalid proxy");
             return 1;
         }
@@ -68,78 +59,55 @@ public class Client extends Ice.Application
         java.io.BufferedReader in = new java.io.BufferedReader(new java.io.InputStreamReader(System.in));
 
         String line = null;
-        do
-        {
-            try
-            {
+        do {
+            try {
                 System.out.print("==> ");
                 System.out.flush();
                 line = in.readLine();
-                if(line == null)
-                {
+                if (line == null) {
                     break;
                 }
-                if(line.equals("1"))
-                {
+                if (line.equals("1")) {
                     proxy.call();
-                }
-                else if(line.equals("2"))
-                {
+                } else if (line.equals("2")) {
                     java.util.Map<String, String> ctx = new java.util.HashMap<String, String>();
                     ctx.put("type", "Explicit");
                     proxy.call(ctx);
-                }
-                else if(line.equals("3"))
-                {
+                } else if (line.equals("3")) {
                     java.util.Map<String, String> ctx = new java.util.HashMap<String, String>();
                     ctx.put("type", "Per-Proxy");
                     ContextPrx proxy2 = ContextPrxHelper.uncheckedCast(proxy.ice_context(ctx));
                     proxy2.call();
-                }
-                else if(line.equals("4"))
-                {
+                } else if (line.equals("4")) {
                     Ice.ImplicitContext ic = communicator().getImplicitContext();
                     java.util.Map<String, String> ctx = new java.util.HashMap<String, String>();
                     ctx.put("type", "Implicit");
                     ic.setContext(ctx);
                     proxy.call();
                     ic.setContext(new java.util.HashMap<String, String>());
-                }
-                else if(line.equals("s"))
-                {
+                } else if (line.equals("s")) {
                     proxy.shutdown();
-                }
-                else if(line.equals("x"))
-                {
+                } else if (line.equals("x")) {
                     // Nothing to do
-                }
-                else if(line.equals("?"))
-                {
+                } else if (line.equals("?")) {
                     menu();
-                }
-                else
-                {
+                } else {
                     System.out.println("unknown command `" + line + "'");
                     menu();
                 }
-            }
-            catch(java.io.IOException ex)
-            {
+            } catch (java.io.IOException ex) {
                 ex.printStackTrace();
-            }
-            catch(Ice.LocalException ex)
-            {
+            } catch (Ice.LocalException ex) {
                 ex.printStackTrace();
             }
         }
-        while(!line.equals("x"));
+        while (!line.equals("x"));
 
         return 0;
     }
 
     public static void
-    main(String[] args)
-    {
+    main(String[] args) {
         Client app = new Client();
         int status = app.main("Client", args, "config.client");
         System.exit(status);

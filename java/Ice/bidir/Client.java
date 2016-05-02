@@ -4,32 +4,30 @@
 //
 // **********************************************************************
 
-import Demo.*;
+import Demo.CallbackSenderPrx;
+import Demo.CallbackSenderPrxHelper;
 
-public class Client extends Ice.Application
-{
+public class Client extends Ice.Application {
     @Override
     public int
-    run(String[] args)
-    {
-        if(args.length > 0)
-        {
+    run(String[] args) {
+        if (args.length > 0) {
             System.err.println(appName() + ": too many arguments");
             return 1;
         }
 
         CallbackSenderPrx server = CallbackSenderPrxHelper.checkedCast(
-            communicator().propertyToProxy("CallbackSender.Proxy"));
-        if(server == null)
-        {
+                communicator().propertyToProxy("CallbackSender.Proxy"));
+        if (server == null) {
             System.err.println("invalid proxy");
             return 1;
         }
 
-        Ice.ObjectAdapter adapter = communicator().createObjectAdapter("");
         Ice.Identity ident = new Ice.Identity();
         ident.name = java.util.UUID.randomUUID().toString();
         ident.category = "";
+
+        Ice.ObjectAdapter adapter = communicator().createObjectAdapter("");
         adapter.add(new CallbackReceiverI(), ident);
         adapter.activate();
         server.ice_getConnection().setAdapter(adapter);
@@ -40,8 +38,7 @@ public class Client extends Ice.Application
     }
 
     public static void
-    main(String[] args)
-    {
+    main(String[] args) {
         Client app = new Client();
         int status = app.main("Client", args, "config.client");
         System.exit(status);
