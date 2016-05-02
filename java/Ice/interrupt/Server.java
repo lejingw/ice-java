@@ -7,18 +7,15 @@
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 
-public class Server extends Ice.Application
-{
+public class Server extends Ice.Application {
     @Override
     public int
-    run(String[] args)
-    {
-        if(args.length > 0)
-        {
+    run(String[] args) {
+        if (args.length > 0) {
             System.err.println(appName() + ": too many arguments");
             return 1;
         }
-        
+
         //
         // If ^C is pressed we want to interrupt all running upcalls from the
         // dispatcher and destroy the communicator.
@@ -26,20 +23,16 @@ public class Server extends Ice.Application
         setInterruptHook(new Thread() {
             @Override
             public void
-            run()
-            {
+            run() {
                 //
                 // Call shutdownNow on the executor. This interrupts all
                 // executor threads causing any running servant dispatch threads
                 // to terminate quickly.
                 //
                 _executor.shutdownNow();
-                try
-                {
+                try {
                     communicator().shutdown();
-                }
-                catch(Ice.LocalException ex)
-                {
+                } catch (Ice.LocalException ex) {
                     ex.printStackTrace();
                 }
             }
@@ -49,13 +42,12 @@ public class Server extends Ice.Application
         adapter.add(new TaskManagerI(_executor), communicator().stringToIdentity("manager"));
         adapter.activate();
         communicator().waitForShutdown();
-        
+
         return 0;
     }
 
     public static void
-    main(String[] args)
-    {
+    main(String[] args) {
         final Server app = new Server();
 
         Ice.InitializationData initData = new Ice.InitializationData();
@@ -69,18 +61,16 @@ public class Server extends Ice.Application
         //
         initData.dispatcher = new Ice.Dispatcher() {
             @Override
-            public void dispatch(Runnable runnable, Ice.Connection con)
-            {
+            public void dispatch(Runnable runnable, Ice.Connection con) {
                 app.getExecutor().submit(runnable);
             }
         };
-        
+
         int status = app.main("Server", args, initData);
         System.exit(status);
     }
-    
-    ExecutorService getExecutor()
-    {
+
+    ExecutorService getExecutor() {
         return _executor;
     }
 

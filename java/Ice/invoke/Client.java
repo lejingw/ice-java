@@ -105,6 +105,7 @@ public class Client extends Ice.Application
                     Ice.OutputStream out = Ice.Util.createOutputStream(communicator());
                     out.startEncapsulation();
                     final String[] arr = { "The", "streaming", "API", "works!" };
+//                    out.writeStringSeq(arr);
                     Demo.StringSeqHelper.write(out, arr);
                     out.endEncapsulation();
 

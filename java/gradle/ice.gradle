@@ -78,6 +78,7 @@ ext {
 
 def localDependency(artifactId) {
     return "com.zeroc:${artifactId}:${project.version}"
+//    return "com.zeroc:${artifactId}:3.6.2"
 }
 ext {
     localDependency = this.&localDependency
