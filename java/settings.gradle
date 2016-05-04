@@ -6,14 +6,14 @@
 
 // Map of dir->subdir for each of the demos.
 def demos = [
-	'Ice' : ['async', 'bidir', 'callback', 'hello', 'invoke',
+	'Ice' : ['async', 'bidir', 'booktest', 'callback', 'hello', 'invoke',
  	'interrupt', 'latency', 'minimal', 'multicast', 'nested',
  	'plugin', 'properties', 'serialize','session', 'swing',
  	'throughput', 'value', 'optional','context'],
  	'IceDiscovery' : ['hello', 'replication'],
 	'Database' : ['library'],
 	'Freeze' : ['bench', 'casino', 'library', 'phonebook', 'transform'],
-	'IceBox' : ['hello'],
+	'IceBox' : ['hello','booktest2'],
 	'Glacier2' : ['callback', 'simpleChat', 'voip'],
 	'IceStorm' : ['clock'],
 	'IceGrid' : ['icebox', 'simple'],
