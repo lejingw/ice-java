@@ -4,14 +4,12 @@
 //
 // **********************************************************************
 
-import Demo.*;
+import Demo._HelloDisp;
 
-public class HelloI extends _HelloDisp
-{
-    @Override
-    public void
-    sayHello(Ice.Current current)
-    {
-        System.out.println("Hello World!");
-    }
+public class HelloI extends _HelloDisp {
+	@Override
+	public void
+	sayHello(Ice.Current current) {
+		System.out.println("Hello World!");
+	}
 }

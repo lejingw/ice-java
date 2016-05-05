@@ -4,25 +4,21 @@
 //
 // **********************************************************************
 
-import Demo.*;
+import Demo.HelloPrx;
+import Demo.HelloPrxHelper;
 
-public class Client
-{
-    public static void
-    main(String[] args)
-    {
-        try
-        {
-            Ice.Communicator communicator = Ice.Util.initialize(args);
-            HelloPrx hello = HelloPrxHelper.checkedCast(
-                communicator.stringToProxy("hello:default -h localhost -p 10000"));
-            hello.sayHello();
-            communicator.destroy();
-        }
-        catch(Ice.LocalException ex)
-        {
-            ex.printStackTrace();
-            System.exit(1);
-        }
-    }
+public class Client {
+	public static void
+	main(String[] args) {
+		try {
+			Ice.Communicator communicator = Ice.Util.initialize(args);
+			HelloPrx hello = HelloPrxHelper.checkedCast(
+					communicator.stringToProxy("hello:default -h localhost -p 10000"));
+			hello.sayHello();
+			communicator.destroy();
+		} catch (Ice.LocalException ex) {
+			ex.printStackTrace();
+			System.exit(1);
+		}
+	}
 }
