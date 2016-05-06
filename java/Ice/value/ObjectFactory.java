@@ -4,35 +4,27 @@
 //
 // **********************************************************************
 
-class ObjectFactory implements Ice.ObjectFactory
-{
-    @Override
-    public Ice.Object
-    create(String type)
-    {
-        if(type.equals("::Demo::Printer"))
-        {
-            return new PrinterI();
-        }
+class ObjectFactory implements Ice.ObjectFactory {
+	@Override
+	public Ice.Object create(String type) {
+		if (type.equals("::Demo::Printer")) {
+			return new PrinterI();
+		}
 
-        if(type.equals("::Demo::DerivedPrinter"))
-        {
-            return new DerivedPrinterI();
-        }
+		if (type.equals("::Demo::DerivedPrinter")) {
+			return new DerivedPrinterI();
+		}
 
-        if(type.equals("::Demo::ClientPrinter"))
-        {
-            return new ClientPrinterI();
-        }
+		if (type.equals("::Demo::ClientPrinter")) {
+			return new ClientPrinterI();
+		}
 
-        assert(false);
-        return null;
-    }
+		assert (false);
+		return null;
+	}
 
-    @Override
-    public void
-    destroy()
-    {
-        // Nothing to do
-    }
+	@Override
+	public void destroy() {
+		// Nothing to do
+	}
 }

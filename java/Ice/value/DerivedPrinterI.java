@@ -9,12 +9,9 @@ import Demo.*;
 class DerivedPrinterI extends DerivedPrinter
 {
     @Override
-    public void
-    printBackwards(Ice.Current current)
-    {
+    public void printBackwards(Ice.Current current) {
         char[] arr = message.toCharArray();
-        for(int i = 0; i < arr.length / 2; i++)
-        {
+        for(int i = 0; i < arr.length / 2; i++) {
             char tmp = arr[arr.length - i - 1];
             arr[arr.length - i - 1] = arr[i];
             arr[i] = tmp;
@@ -23,9 +20,7 @@ class DerivedPrinterI extends DerivedPrinter
     }
 
     @Override
-    public void
-    printUppercase(Ice.Current current)
-    {
+    public void printUppercase(Ice.Current current) {
         System.out.println(derivedMessage.toUpperCase());
     }
 }

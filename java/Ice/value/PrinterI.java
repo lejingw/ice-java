@@ -4,14 +4,12 @@
 //
 // **********************************************************************
 
-import Demo.*;
+import Demo.Printer;
 
 class PrinterI extends Printer
 {
     @Override
-    public void
-    printBackwards(Ice.Current current)
-    {
+    public void printBackwards(Ice.Current current) {
         char[] arr = message.toCharArray();
         for(int i = 0; i < arr.length / 2; i++)
         {

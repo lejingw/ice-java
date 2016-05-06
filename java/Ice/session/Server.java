@@ -5,40 +5,37 @@
 // **********************************************************************
 
 
+import java.util.concurrent.ScheduledExecutorService;
 
-public class Server extends Ice.Application
-{
-    @Override
-    public int
-    run(String[] args)
-    {
-        if(args.length > 0)
-        {
-            System.err.println(appName() + ": too many arguments");
-            return 1;
-        }
+public class Server extends Ice.Application {
+	@Override
+	public int
+	run(String[] args) {
+		if (args.length > 0) {
+			System.err.println(appName() + ": too many arguments");
+			return 1;
+		}
 
-        Ice.ObjectAdapter adapter = communicator().createObjectAdapter("SessionFactory");
+		Ice.ObjectAdapter adapter = communicator().createObjectAdapter("SessionFactory");
 
-        java.util.concurrent.ScheduledExecutorService executor = java.util.concurrent.Executors.newScheduledThreadPool(1);
-        ReapTask reaper = new ReapTask();
-        executor.scheduleAtFixedRate(reaper, 1, 1, java.util.concurrent.TimeUnit.SECONDS);
+		ScheduledExecutorService executor = java.util.concurrent.Executors.newScheduledThreadPool(1);
+		ReapTask reaper = new ReapTask();
+		executor.scheduleAtFixedRate(reaper, 1, 1, java.util.concurrent.TimeUnit.SECONDS);
 
-        adapter.add(new SessionFactoryI(reaper), communicator().stringToIdentity("SessionFactory"));
-        adapter.activate();
-        communicator().waitForShutdown();
+		adapter.add(new SessionFactoryI(reaper), communicator().stringToIdentity("SessionFactory"));
+		adapter.activate();
+		communicator().waitForShutdown();
 
-        executor.shutdown();
-        reaper.terminate();
+		executor.shutdown();
+		reaper.terminate();
 
-        return 0;
-    }
+		return 0;
+	}
 
-    public static void
-    main(String[] args)
-    {
-        Server app = new Server();
-        int status = app.main("Server", args, "config.server");
-        System.exit(status);
-    }
+	public static void
+	main(String[] args) {
+		Server app = new Server();
+		int status = app.main("Server", args, "config.server");
+		System.exit(status);
+	}
 }
