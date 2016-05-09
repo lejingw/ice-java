@@ -20,14 +20,7 @@ public class Client {
 		SmsServicePrx prx = SmsServicePrxHelper.checkedCast(proxy);
 		if (null == prx)
 			throw new Error("Invalid proxy");
-		Message msg = new Message();
-		{
-			msg.name = "Mr Wang";
-			msg.type = 3;
-			msg.price = 99.99;
-			msg.valid = true;
-			msg.content = "abcdef";
-		}
+
 		long start = System.currentTimeMillis();
 		int count = 1;
 		for (int i = 0; i < count; i++) {

@@ -4,11 +4,9 @@
 //
 // **********************************************************************
 
-public class HelloServiceI implements IceBox.Service
-{
+public class HelloServiceI implements IceBox.Service {
     @Override
-    public void
-    start(String name, Ice.Communicator communicator, String[] args)
+    public void start(String name, Ice.Communicator communicator, String[] args)
     {
         _adapter = communicator.createObjectAdapter(name);
         _adapter.add(new HelloI(), communicator.stringToIdentity("hello"));
@@ -16,8 +14,7 @@ public class HelloServiceI implements IceBox.Service
     }
 
     @Override
-    public void
-    stop()
+    public void stop()
     {
         _adapter.destroy();
     }
