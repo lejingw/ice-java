@@ -4,14 +4,11 @@
 //
 // **********************************************************************
 
-import Demo.*;
+import Demo._CallbackReceiverDisp;
 
-public final class CallbackReceiverI extends _CallbackReceiverDisp
-{
-    @Override
-    public void
-    callback(Ice.Current current)
-    {
-        System.out.println("received callback");
-    }
+public final class CallbackReceiverI extends _CallbackReceiverDisp {
+	@Override
+	public void	callback(Ice.Current current) {
+		System.out.println("received callback");
+	}
 }

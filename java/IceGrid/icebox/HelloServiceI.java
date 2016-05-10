@@ -4,25 +4,20 @@
 //
 // **********************************************************************
 
-public class HelloServiceI implements IceBox.Service
-{
-    @Override
-    public void
-    start(String name, Ice.Communicator communicator, String[] args)
-    {
-        _adapter = communicator.createObjectAdapter("Hello-" + name);
+public class HelloServiceI implements IceBox.Service {
+	@Override
+	public void start(String name, Ice.Communicator communicator, String[] args) {
+		_adapter = communicator.createObjectAdapter("Hello-" + name);
 
-        String helloIdentity = communicator.getProperties().getProperty("Hello.Identity");
-        _adapter.add(new HelloI(name), communicator.stringToIdentity(helloIdentity));
-        _adapter.activate();
-    }
+		String helloIdentity = communicator.getProperties().getProperty("Hello.Identity");
+		_adapter.add(new HelloI(name), communicator.stringToIdentity(helloIdentity));
+		_adapter.activate();
+	}
 
-    @Override
-    public void
-    stop()
-    {
-        _adapter.destroy();
-    }
+	@Override
+	public void stop() {
+		_adapter.destroy();
+	}
 
-    private Ice.ObjectAdapter _adapter;
+	private Ice.ObjectAdapter _adapter;
 }

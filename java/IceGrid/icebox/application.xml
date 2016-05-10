@@ -46,7 +46,7 @@
 
       <node name="node1">
          <server-instance template="Glacier2" 
-                          instance-name="DemoGlacier2" 
+                          instance-name="DemoGlacier2"
                           client-endpoints="tcp -h localhost -p 4063" 
                           server-endpoints="tcp -h localhost">
             <properties>
@@ -67,6 +67,28 @@
             <service-instance template="HelloService" name="Lisa"/>
             <service-instance template="HelloService" name="Maggie"/>
             <env>LANG=en</env>
+         </icebox>
+      </node>
+      <node name="node2">
+         <server-instance template="Glacier2"
+                          instance-name="Demo2Glacier2"
+                          client-endpoints="tcp -h localhost -p 4073"
+                          server-endpoints="tcp -h localhost">
+            <properties>
+               <property name="Glacier2.SessionManager" value="DemoIceGrid/AdminSessionManager"/>
+               <property name="Glacier2.PermissionsVerifier" value="Demo2Glacier2/NullPermissionsVerifier"/>
+            </properties>
+         </server-instance>
+         <icebox id="IceBox2" activation="on-demand" exe="java">
+            <description>A sample IceBox server2</description>
+            <option>IceBox.Server</option>
+            <properties>
+               <properties refid="mx"/>
+               <property name="IceBox.Trace.ServiceObserver" value="1"/>
+            </properties>
+            <service-instance template="HelloService" name="Homer2"/>
+            <service-instance template="HelloService" name="Maggie2"/>
+            <env>LANG=it</env>
          </icebox>
       </node>
    </application>
