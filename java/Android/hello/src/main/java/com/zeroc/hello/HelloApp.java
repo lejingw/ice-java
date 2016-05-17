@@ -6,7 +6,6 @@
 
 package com.zeroc.hello;
 
-import Ice.Communicator;
 import android.app.Application;
 import android.os.Build.VERSION;
 import android.os.Handler;
@@ -16,12 +15,15 @@ import android.os.Message;
 import java.util.LinkedList;
 import java.util.List;
 
-public class HelloApp extends Application
-{
-    static class MessageReady
-    {
-        MessageReady(Communicator c, Ice.LocalException e)
-        {
+import Demo.Callback_Hello_sayHello;
+import Demo.Callback_Hello_shutdown;
+import Demo.HelloPrx;
+import Demo.HelloPrxHelper;
+import Ice.Communicator;
+
+public class HelloApp extends Application {
+    static class MessageReady {
+        MessageReady(Communicator c, Ice.LocalException e) {
             communicator = c;
             ex = e;
         }
@@ -31,35 +33,26 @@ public class HelloApp extends Application
     }
 
     @Override
-    public void onCreate()
-    {
+    public void onCreate() {
         super.onCreate();
-        _uiHandler = new Handler(Looper.getMainLooper())
-        {
+        _uiHandler = new Handler(Looper.getMainLooper()) {
             @Override
-            public void handleMessage(Message m)
-            {
-                if(m.what == MSG_READY)
-                {
-                    MessageReady ready = (MessageReady)m.obj;
+            public void handleMessage(Message m) {
+                if (m.what == MSG_READY) {
+                    MessageReady ready = (MessageReady) m.obj;
                     _initialized = true;
                     _communicator = ready.communicator;
                     _ex = ready.ex;
-                }
-                else if(m.what == MSG_EXCEPTION || m.what == MSG_RESPONSE)
-                {
+                } else if (m.what == MSG_EXCEPTION || m.what == MSG_RESPONSE) {
                     _result = null;
                 }
 
                 Message copy = new Message();
                 copy.copyFrom(m);
 
-                if(_handler != null)
-                {
+                if (_handler != null) {
                     _handler.sendMessage(copy);
-                }
-                else
-                {
+                } else {
                     _queue.add(copy);
                 }
             }
@@ -67,20 +60,15 @@ public class HelloApp extends Application
 
         // SSL initialization can take some time. To avoid blocking the
         // calling thread, we perform the initialization in a separate thread.
-        new Thread(new Runnable()
-        {
-            public void run()
-            {
-                try
-                {
+        new Thread(new Runnable() {
+            public void run() {
+                try {
                     Ice.InitializationData initData = new Ice.InitializationData();
 
-                    initData.dispatcher = new Ice.Dispatcher()
-                    {
+                    initData.dispatcher = new Ice.Dispatcher() {
                         @Override
                         public void
-                        dispatch(Runnable runnable, Ice.Connection connection)
-                        {
+                        dispatch(Runnable runnable, Ice.Connection connection) {
                             _uiHandler.post(runnable);
                         }
                     };
@@ -96,13 +84,12 @@ public class HelloApp extends Application
                     initData.properties.setProperty("Ice.Plugin.IceSSL", "IceSSL.PluginFactory");
 
                     // SDK versions < 21 only support TLSv1 with SSLEngine.
-                    if(VERSION.SDK_INT < 21)
-                    {
+                    if (VERSION.SDK_INT < 21) {
                         initData.properties.setProperty("IceSSL.Protocols", "tls1_0");
                     }
 
                     Ice.Communicator c = Ice.Util.initialize(initData);
-                    IceSSL.Plugin plugin = (IceSSL.Plugin)c.getPluginManager().getPlugin("IceSSL");
+                    IceSSL.Plugin plugin = (IceSSL.Plugin) c.getPluginManager().getPlugin("IceSSL");
                     //
                     // Be sure to pass the same input stream to the SSL plug-in for
                     // both the keystore and the truststore. This makes startup a
@@ -115,50 +102,38 @@ public class HelloApp extends Application
                     c.getPluginManager().initializePlugins();
 
                     _uiHandler.sendMessage(Message.obtain(_uiHandler, MSG_READY, new MessageReady(c, null)));
-                }
-                catch(Ice.LocalException e)
-                {
+                } catch (Ice.LocalException e) {
                     _uiHandler.sendMessage(Message.obtain(_uiHandler, MSG_READY, new MessageReady(null, e)));
                 }
             }
         }).start();
     }
 
-    /** Called when the application is stopping. */
+    /**
+     * Called when the application is stopping.
+     */
     @Override
-    public void onTerminate()
-    {
+    public void onTerminate() {
         super.onTerminate();
-        if(_communicator != null)
-        {
-            try
-            {
+        if (_communicator != null) {
+            try {
                 _communicator.destroy();
-            }
-            catch(Ice.LocalException ex)
-            {
+            } catch (Ice.LocalException ex) {
             }
         }
     }
 
-    void setHandler(Handler handler)
-    {
+    void setHandler(Handler handler) {
         // Nothing to do in this case.
-        if(_handler != handler)
-        {
+        if (_handler != handler) {
             _handler = handler;
 
-            if(_handler != null)
-            {
-                if(!_initialized)
-                {
+            if (_handler != null) {
+                if (!_initialized) {
                     _handler.sendMessage(_handler.obtainMessage(MSG_WAIT));
-                }
-                else
-                {
+                } else {
                     // Send all the queued messages.
-                    while(!_queue.isEmpty())
-                    {
+                    while (!_queue.isEmpty()) {
                         _handler.sendMessage(_queue.remove(0));
                     }
                 }
@@ -166,195 +141,153 @@ public class HelloApp extends Application
         }
     }
 
-    void setHost(String host)
-    {
+    void setHost(String host) {
         _host = host;
         _proxy = null;
     }
 
-    void setTimeout(int timeout)
-    {
+    void setTimeout(int timeout) {
         _timeout = timeout;
         _proxy = null;
     }
 
-    void setDeliveryMode(DeliveryMode mode)
-    {
+    void setDeliveryMode(DeliveryMode mode) {
         _mode = mode;
         _proxy = null;
     }
 
-    void flush()
-    {
-        if(_proxy != null)
-        {
+    void flush() {
+        if (_proxy != null) {
             _proxy.begin_ice_flushBatchRequests(new Ice.Callback_Object_ice_flushBatchRequests() {
                 @Override
-                public void exception(final Ice.LocalException ex)
-                {
+                public void exception(final Ice.LocalException ex) {
                     _uiHandler.sendMessage(_uiHandler.obtainMessage(MSG_EXCEPTION, ex));
                 }
             });
         }
     }
 
-    void shutdown()
-    {
-        try
-        {
+    void shutdown() {
+        try {
             updateProxy();
-            if(_proxy == null)
-            {
+            if (_proxy == null) {
                 return;
             }
             _proxy.shutdown();
-        }
-        catch(Ice.LocalException ex)
-        {
+        } catch (Ice.LocalException ex) {
             _uiHandler.sendMessage(_uiHandler.obtainMessage(MSG_EXCEPTION, ex));
         }
 
     }
 
-    void shutdownAsync()
-    {
-        try
-        {
+    void shutdownAsync() {
+        try {
             updateProxy();
-            if(_proxy == null || _result != null)
-            {
+            if (_proxy == null || _result != null) {
                 return;
             }
 
             _resultMode = _mode;
             _uiHandler.sendMessage(_uiHandler.obtainMessage(MSG_SENDING));
-            _result = _proxy.begin_shutdown(new Demo.Callback_Hello_shutdown()
-            {
+            _result = _proxy.begin_shutdown(new Callback_Hello_shutdown() {
                 @Override
-                synchronized public void exception(final Ice.LocalException ex)
-                {
+                synchronized public void exception(final Ice.LocalException ex) {
                     _response = true;
                     _uiHandler.sendMessage(_uiHandler.obtainMessage(MSG_EXCEPTION, ex));
                 }
 
                 @Override
-                synchronized public void response()
-                {
+                synchronized public void response() {
                     _response = true;
                     _uiHandler.sendMessage(_uiHandler.obtainMessage(MSG_RESPONSE));
                 }
 
                 @Override
-                synchronized public void sent(boolean sentSynchronously)
-                {
-                    if(_resultMode.isOneway())
-                    {
+                synchronized public void sent(boolean sentSynchronously) {
+                    if (_resultMode.isOneway()) {
                         _uiHandler.sendMessage(_uiHandler.obtainMessage(MSG_RESPONSE));
-                    }
-                    else if(!_response)
-                    {
+                    } else if (!_response) {
                         _uiHandler.sendMessage(_uiHandler.obtainMessage(MSG_SENT, _resultMode));
                     }
                 }
+
                 // There is no ordering guarantee between sent, response/exception.
                 private boolean _response = false;
             });
-        }
-        catch(Ice.LocalException ex)
-        {
+        } catch (Ice.LocalException ex) {
             _uiHandler.sendMessage(_uiHandler.obtainMessage(MSG_EXCEPTION, ex));
         }
     }
 
-    void sayHello(int delay)
-    {
-        try
-        {
+    void sayHello(int delay) {
+        try {
             updateProxy();
-            if(_proxy == null || _result != null)
-            {
+            if (_proxy == null || _result != null) {
                 return;
             }
 
             _proxy.begin_sayHello(delay);
-        }
-        catch(Ice.LocalException ex)
-        {
+        } catch (Ice.LocalException ex) {
             _uiHandler.sendMessage(_uiHandler.obtainMessage(MSG_EXCEPTION, ex));
         }
     }
 
-    void sayHelloAsync(int delay)
-    {
-        try
-        {
+    void sayHelloAsync(int delay) {
+        try {
             updateProxy();
-            if(_proxy == null || _result != null)
-            {
+            if (_proxy == null || _result != null) {
                 return;
             }
 
             _resultMode = _mode;
             _uiHandler.sendMessage(_uiHandler.obtainMessage(MSG_SENDING));
             _result = _proxy.begin_sayHello(delay,
-                    new Demo.Callback_Hello_sayHello()
-                    {
+                    new Callback_Hello_sayHello() {
                         @Override
-                        synchronized public void exception(final Ice.LocalException ex)
-                        {
+                        synchronized public void exception(final Ice.LocalException ex) {
                             _response = true;
                             _uiHandler.sendMessage(_uiHandler.obtainMessage(MSG_EXCEPTION, ex));
                         }
 
                         @Override
-                        synchronized public void response()
-                        {
+                        synchronized public void response() {
                             _response = true;
                             _uiHandler.sendMessage(_uiHandler.obtainMessage(MSG_RESPONSE));
                         }
 
                         @Override
-                        synchronized public void sent(boolean sentSynchronously)
-                        {
-                            if(_resultMode.isOneway())
-                            {
+                        synchronized public void sent(boolean sentSynchronously) {
+                            if (_resultMode.isOneway()) {
                                 _uiHandler.sendMessage(_uiHandler.obtainMessage(MSG_RESPONSE));
-                            }
-                            else if(!_response)
-                            {
+                            } else if (!_response) {
                                 _uiHandler.sendMessage(_uiHandler.obtainMessage(MSG_SENT, _resultMode));
                             }
                         }
+
                         // There is no ordering guarantee between sent, response/exception.
                         private boolean _response = false;
                     });
-        }
-        catch(Ice.LocalException ex)
-        {
+        } catch (Ice.LocalException ex) {
             _uiHandler.sendMessage(_uiHandler.obtainMessage(MSG_EXCEPTION, ex));
         }
     }
 
-    private void updateProxy()
-    {
-        if(_proxy != null)
-        {
+    private void updateProxy() {
+        if (_proxy != null) {
             return;
         }
 
-        String s = "hello:tcp -h " + _host + " -p 10000:ssl -h " + _host + " -p 10001:udp -h " + _host  + " -p 10000";
+        String s = "hello:tcp -h " + _host + " -p 10000:ssl -h " + _host + " -p 10001:udp -h " + _host + " -p 10000";
         Ice.ObjectPrx prx = _communicator.stringToProxy(s);
         prx = _mode.apply(prx);
-        if(_timeout != 0)
-        {
+        if (_timeout != 0) {
             prx = prx.ice_invocationTimeout(_timeout);
         }
 
-        _proxy = Demo.HelloPrxHelper.uncheckedCast(prx);
+        _proxy = HelloPrxHelper.uncheckedCast(prx);
     }
 
-    DeliveryMode getDeliveryMode()
-    {
+    DeliveryMode getDeliveryMode() {
         return _mode;
     }
 
@@ -370,7 +303,7 @@ public class HelloApp extends Application
 
     private boolean _initialized;
     private Ice.Communicator _communicator;
-    private Demo.HelloPrx _proxy = null;
+    private HelloPrx _proxy = null;
 
     // The current request if any.
     private Ice.AsyncResult _result;

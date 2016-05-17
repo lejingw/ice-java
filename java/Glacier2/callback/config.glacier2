@@ -41,6 +41,14 @@ Glacier2.SessionTimeout=30
 #Glacier2.Client.Buffered=0
 #Glacier2.Server.Buffered=0
 
+
+#
+# https://doc.zeroc.com/pages/viewpage.action?pageId=14031644#Glacier2.*-Glacier2.CryptPasswords
+# pip install zeroc-icehashpassword
+# python icehashpassword.py -r 25000 -s 32 -d sha256
+#
+# Glacier2.CryptPasswords=<passwords file>
+
 #
 # These two lines instruct Glacier2 to forward contexts both for
 # regular routing, as well as for callbacks (reverse routing).
